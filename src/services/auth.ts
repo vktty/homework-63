@@ -6,6 +6,12 @@ import {
 	UserReturn,
 } from '../interfaces';
 import { Password } from '../modules';
+import {
+	InvalidCredentials,
+	Notfound,
+	ValidationError,
+} from '../modules/erros';
+import { validationResult } from 'express-validator';
 
 type AuthConstructorParams = {
 	repository: IRepository;
@@ -26,6 +32,10 @@ export class AuthService {
 			password,
 		}: Pick<IUser, 'email' | 'name' | 'password'>,
 	) {
+		const result = validationResult(req);
+		if (!result.isEmpty())
+			throw new ValidationError('Validation failed');
+
 		const hashedPassword = await Password.hash(password);
 
 		const newUser = {
@@ -42,7 +52,9 @@ export class AuthService {
 			});
 
 		if (existingUser)
-			throw new Error('User with this email already exists!');
+			throw new ValidationError(
+				'User with this email already exists!',
+			);
 
 		const createdUser = await this.repository.create<IUser, IUser>(
 			newUser,
@@ -51,9 +63,8 @@ export class AuthService {
 		const token = jwt.sign(
 			{ user: { id: newUser.id } },
 			process.env.JWT_SECRET!,
-			{ expiresIn: '1h' },
+			{ expiresIn: '7d' },
 		);
-
 		const { password: _, ...userData } = createdUser;
 
 		return { ...userData, token };
@@ -67,17 +78,22 @@ export class AuthService {
 			{ email },
 		);
 		if (!existingUser)
-			throw new Error("User with this email doen't exist!");
+			throw new Notfound(
+				"User with this email doen't exist!",
+			);
+
 		const result = await Password.verify(
 			existingUser.password,
 			password,
 		);
+		if (!result)
+			throw new InvalidCredentials('Invalid credentials');
+
 		const token = jwt.sign(
 			{ user: { id: existingUser.id } },
 			process.env.JWT_SECRET!,
-			{ expiresIn: '1h' },
+			{ expiresIn: '7d' },
 		);
-
 		const { password: _, ...userData } = existingUser;
 
 		return { ...userData, token };

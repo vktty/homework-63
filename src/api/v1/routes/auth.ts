@@ -3,11 +3,9 @@ import { body } from 'express-validator';
 import { AuthRepository } from '../../../repositories';
 import { AuthService } from '../../../services';
 import { AuthController } from '../controllers';
-import { authVerification } from '../../../middlewares';
 
 export const auth = () => {
 	const router = Router();
-	router.use(authVerification);
 
 	const repository = new AuthRepository();
 	const service = new AuthService({ repository });

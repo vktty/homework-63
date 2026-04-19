@@ -1,5 +1,5 @@
 import { NextFunction, Response } from 'express';
-import { IExtendedRequest } from '../../../interfaces';
+import { IExtendedRequest, StatusCodes } from '../../../interfaces';
 import { BoardService } from '../../../services';
 
 type BoardConstructorParams = {
@@ -17,10 +17,10 @@ export class BoardController {
 		next: NextFunction,
 	) {
 		this.boardService
-			.getAll()
+			.getAll(req)
 			.then((boards) => {
 				return res
-					.status(200)
+					.status(StatusCodes.OK)
 					.json({ data: boards, error: {} });
 			})
 			.catch((error) => {
@@ -38,14 +38,16 @@ export class BoardController {
 	) {
 		const { boardId } = req.params;
 		if (!boardId || Array.isArray(boardId))
-			return res.status(400).json({
-				error: 'Invalid boardId',
-			});
+			return res
+				.status(StatusCodes.INTERNAL_SERVER_ERROR)
+				.json({
+					error: 'Invalid boardId',
+				});
 		this.boardService
 			.findById(boardId)
 			.then((board) => {
 				return res
-					.status(200)
+					.status(StatusCodes.OK)
 					.json({ data: board, error: {} });
 			})
 			.catch((error) => {
@@ -67,7 +69,7 @@ export class BoardController {
 			.create(data)
 			.then((board) => {
 				return res
-					.status(201)
+					.status(StatusCodes.CREATED)
 					.json({ data: board, error: {} });
 			})
 			.catch((error) => {
@@ -86,15 +88,18 @@ export class BoardController {
 	) {
 		const { boardId } = req.params;
 		if (!boardId || Array.isArray(boardId))
-			return res.status(400).json({
-				error: 'Invalid boardId',
-			});
+			return res
+				.status(StatusCodes.INTERNAL_SERVER_ERROR)
+				.json({
+					error: 'Invalid boardId',
+				});
+
 		const data = req.body;
 		this.boardService
 			.update(boardId, data)
 			.then((board) => {
 				return res
-					.status(200)
+					.status(StatusCodes.OK)
 					.json({ data: board, error: {} });
 			})
 			.catch((error) => {
@@ -113,13 +118,15 @@ export class BoardController {
 	) {
 		const { boardId } = req.params;
 		if (!boardId || Array.isArray(boardId))
-			return res.status(400).json({
-				error: 'Invalid boardId',
-			});
+			return res
+				.status(StatusCodes.INTERNAL_SERVER_ERROR)
+				.json({
+					error: 'Invalid boardId',
+				});
 		this.boardService
 			.delete(boardId)
 			.then(() => {
-				return res.status(200).json({
+				return res.status(StatusCodes.OK).json({
 					data: {},
 					error: {},
 				});

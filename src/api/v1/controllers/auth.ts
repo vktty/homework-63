@@ -1,5 +1,5 @@
 import { Response, NextFunction } from 'express';
-import { IExtendedRequest } from '../../../interfaces';
+import { IExtendedRequest, StatusCodes } from '../../../interfaces';
 import { AuthService } from '../../../services';
 
 type AuthConstructorParams = {
@@ -18,7 +18,7 @@ export class AuthController {
 			.getUser(req, { email, password })
 			.then((user) => {
 				return res
-					.status(200)
+					.status(StatusCodes.OK)
 					.cookie('token', user.token, {
 						httpOnly: true,
 					})
@@ -39,7 +39,7 @@ export class AuthController {
 			.createUser(req, { email, name, password })
 			.then((user) => {
 				return res
-					.status(200)
+					.status(StatusCodes.OK)
 					.cookie('token', user.token, {
 						httpOnly: true,
 					})

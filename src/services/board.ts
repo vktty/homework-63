@@ -1,4 +1,10 @@
-import { BoardUpdate, IBoard, IRepository } from '../interfaces';
+import {
+	BoardUpdate,
+	IBoard,
+	IExtendedRequest,
+	IRepository,
+} from '../interfaces';
+import { Forbidden, Notfound, Unauthorized } from '../modules/erros';
 
 type BoardConstructorParams = {
 	repository: IRepository;
@@ -9,8 +15,15 @@ export class BoardService {
 	constructor({ repository }: BoardConstructorParams) {
 		this.repository = repository;
 	}
-	public async getAll() {
-		return this.repository.findAll();
+	public async getAll(req: IExtendedRequest) {
+		if (!req.user!.id)
+			throw new Unauthorized('You are not authorized!');
+		const authorId = req.user!.id;
+
+		const boards = await this.repository.findByQuery<IBoard>({
+			authorId,
+		});
+		return boards;
 	}
 	public async findById(id: string) {
 		return this.repository.findById(id);

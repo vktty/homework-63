@@ -22,8 +22,9 @@ export class Password {
 	}
 
 	static async verify(existingPassword: string, inputPassword: string) {
-		const [salt, hash] = existingPassword.split(';');
-		const derivedHash = await Password.hash(inputPassword, salt);
+		const [salt, hash] = existingPassword.split(':');
+		const derived = await Password.hash(inputPassword, salt);
+		const [_, derivedHash] = derived.split(':');
 		return derivedHash === hash;
 	}
 }
