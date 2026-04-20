@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { body } from 'express-validator';
+import { body, query } from 'express-validator';
 import { BoardRepository, TaskRepository } from '../../../repositories';
 import { BoardService } from '../../../services';
 import { BoardController } from '../controllers';
@@ -43,6 +43,12 @@ export const board = () => {
 		.delete(controller.deleteBoard.bind(controller));
 
 	router.route('/:boardId/tasks').get(
+		[
+			query('boardId')
+				.trim()
+				.notEmpty()
+				.withMessage('boardId is required!'),
+		],
 		controller.getBoardTasks.bind(controller),
 	);
 	return router;
