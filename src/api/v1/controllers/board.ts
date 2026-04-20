@@ -17,7 +17,7 @@ export class BoardController {
 		next: NextFunction,
 	) {
 		this.boardService
-			.getAll(req)
+			.getAllBoards(req)
 			.then((boards) => {
 				return res
 					.status(StatusCodes.OK)
@@ -26,6 +26,35 @@ export class BoardController {
 			.catch((error) => {
 				req.log?.error(
 					'An error occurred while getting boards!',
+					{ error },
+				);
+				next(error);
+			});
+	}
+	async getBoardTasks(
+		req: IExtendedRequest,
+		res: Response,
+		next: NextFunction,
+	) {
+		const { boardId } = req.params;
+		if (!boardId || Array.isArray(boardId))
+			return res
+				.status(StatusCodes.INTERNAL_SERVER_ERROR)
+				.json({
+					error: 'Invalid boardId',
+				});
+
+		this.boardService
+			.getAllBoardTasks(req)
+			.then((tasks) => {
+				return res.status(StatusCodes.OK).json({
+					data: tasks,
+					error: {},
+				});
+			})
+			.catch((error) => {
+				req.log?.error(
+					'An error occurred while getting tasks!',
 					{ error },
 				);
 				next(error);

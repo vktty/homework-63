@@ -17,13 +17,14 @@ export const createApp = ({ logFilePath }: IApp) => {
 	const app = express();
 
 	app.use('/static', express.static(staticPath));
+
 	app.use(express.json());
 	app.use(cookieParser());
 	app.use(requestLogger(logFilePath));
 
 	app.get('/', (req: IExtendedRequest, res: Response) => {
 		res.status(StatusCodes.OK).json({
-			message: `This is Tasks Manager's home page`,
+			message: `This is Tasks Manager's home page, ${staticPath}`,
 		});
 	});
 

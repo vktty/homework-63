@@ -6,8 +6,10 @@ import { createLogger } from './modules';
 try {
 	const { PORT, DB_URI, DB_PORT } = process.env;
 	if (!PORT) console.error("PORT isn't defined");
-	if (!DB_PORT || !DB_URI)
+	if (!DB_PORT || !DB_URI) {
 		console.error("DB_PORT or DB_URI isn't defined");
+		throw new Error("DB_PORT or DB_URI isn't defined");
+	}
 	connect(`${DB_URI}:${DB_PORT}`)
 		.then(() => {
 			const logs = path.join(__dirname, 'logs');

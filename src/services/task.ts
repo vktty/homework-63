@@ -34,8 +34,10 @@ export class TaskService {
 			authorId: req.user!.id,
 			boardId: boardId as string,
 		});
+
 		if (!tasks || tasks.length === 0)
 			throw new Notfound('Tasks not found!');
+
 		return tasks;
 	}
 	public async findById(id: string) {

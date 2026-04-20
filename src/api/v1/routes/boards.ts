@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { body } from 'express-validator';
-import { BoardRepository } from '../../../repositories';
+import { BoardRepository, TaskRepository } from '../../../repositories';
 import { BoardService } from '../../../services';
 import { BoardController } from '../controllers';
 import { authVerification } from '../../../middlewares';
@@ -9,8 +9,9 @@ export const board = () => {
 	const router = Router();
 	router.use(authVerification);
 
-	const repository = new BoardRepository();
-	const service = new BoardService({ repository });
+	const boardRepository = new BoardRepository();
+	const taskRepository = new TaskRepository();
+	const service = new BoardService({ boardRepository, taskRepository });
 	const controller = new BoardController({ boardService: service });
 
 	router.route('/')
@@ -41,5 +42,8 @@ export const board = () => {
 		)
 		.delete(controller.deleteBoard.bind(controller));
 
+	router.route('/:boardId/tasks').get(
+		controller.getBoardTasks.bind(controller),
+	);
 	return router;
 };
